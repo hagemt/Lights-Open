@@ -7,6 +7,10 @@ Players are able to toggle grid squares by left-clicking on the desired square.
 
 Right-clicking anywhere on the grid rolls back the last move.
 
+To run, simply compile all the source files, and invoke:
+
+$ java LightsOpenFrame statefile1.los statefile2.los ...
+
 [1]: http://en.wikipedia.org/wiki/Lights_Out_%28game%29
 
 License
