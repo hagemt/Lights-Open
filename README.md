@@ -10,12 +10,13 @@ Right-clicking anywhere on the grid rolls back the last move.
 License
 -------
 
-The "Modified BSD License," as defined by the Open Source Initiative[2][3], governs Lights Open's availability.
+The "Modified BSD License," as defined by the Open Source Initiative, governs Lights Open's availability. [2]
+
+Full text of the agreement is included in the ./COPYING file.
 
 Contributors to Lights Open may add their names (and email address) to the ./AUTHORS file, if they so choose.
 
-[2]: At OSI's website: http://www.opensource.org/licenses/bsd-license
-[3]: Full text included in ./COPYING
+[2]: http://www.opensource.org/licenses/bsd-license
 
 Source Code
 ----
@@ -26,4 +27,4 @@ One may retrieve it by issuing the following command:
 
 $ git clone git://github.com/hagemt/flick.git
 
-[4]: Viewable online: https://www.github.com/hagemt/Lights-Open
+[4]: https://www.github.com/hagemt/Lights-Open
