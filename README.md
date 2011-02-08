@@ -9,7 +9,7 @@ Right-clicking anywhere on the grid rolls back the last move.
 
 To run, simply compile all the source files, and invoke:
 
-$ java LightsOpenFrame statefile1.los statefile2.los ...
+$ java edu.rpi.proglang.hw1.LightsOpenFrame statefile1.los statefile2.los ...
 
 [1]: http://en.wikipedia.org/wiki/Lights_Out_%28game%29
 

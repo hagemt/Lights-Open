@@ -42,7 +42,6 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 		}
 		container = new JPanel(new GridLayout(state.size(), min_width, 5, 5));
 		grid = new Cell[state.size()][min_width];
-		toggleCount = 0;
 		moves = new LinkedList<Dimension>();
 		for (int i = 0; i < state.size(); ++i) {
 			for (int j = 0; j < min_width; ++j) {
@@ -57,7 +56,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 		container.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		getContentPane().add(container);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setTitle("Lights Open (t = 0)");
+		setTitle("Lights Open (t = " + (toggleCount = 0) + ")");
 		pack();
 	}
 
@@ -86,7 +85,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			}
 			setTitle("Lights Open (t = " + ++toggleCount + ")");
 			c.l.setText(Integer.toString(++c.z));
-			moves.add(new Dimension(c.x, c.y));
+			moves.push(new Dimension(c.x, c.y));
 			break;
 		case MouseEvent.BUTTON3:
 			if (moves.isEmpty()) {
@@ -110,6 +109,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			}
 			setTitle("Lights Open (t = " + --toggleCount + ")");
 			c.l.setText(Integer.toString(--c.z));
+			mouseEntered(e);
 			break;
 		}
 	}
