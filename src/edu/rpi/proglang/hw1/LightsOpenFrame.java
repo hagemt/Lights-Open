@@ -57,7 +57,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 		container.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		getContentPane().add(container);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setTitle("Lights Out (t = 0)");
+		setTitle("Lights Open (t = 0)");
 		pack();
 	}
 
@@ -84,7 +84,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			if (c.y + 1 < grid[c.x].length) {
 				setEnabled(grid[c.x][c.y + 1], !grid[c.x][c.y + 1].s);
 			}
-			setTitle("Lights Out (t = " + ++toggleCount + ")");
+			setTitle("Lights Open (t = " + ++toggleCount + ")");
 			c.l.setText(Integer.toString(++c.z));
 			moves.add(new Dimension(c.x, c.y));
 			break;
@@ -108,7 +108,7 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			if (c.y + 1 < grid[c.x].length) {
 				setEnabled(grid[c.x][c.y + 1], !grid[c.x][c.y + 1].s);
 			}
-			setTitle("Lights Out (t = " + --toggleCount + ")");
+			setTitle("Lights Open (t = " + --toggleCount + ")");
 			c.l.setText(Integer.toString(--c.z));
 			break;
 		}
