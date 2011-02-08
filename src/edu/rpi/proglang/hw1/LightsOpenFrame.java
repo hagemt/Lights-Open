@@ -89,6 +89,9 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			moves.add(new Dimension(c.x, c.y));
 			break;
 		case MouseEvent.BUTTON3:
+			if (moves.isEmpty()) {
+				return;
+			}
 			mouseExited(e);
 			Dimension d = moves.pop();
 			c = grid[d.width][d.height];
