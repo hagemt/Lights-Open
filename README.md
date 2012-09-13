@@ -31,6 +31,6 @@ In accordance with the above, Lights Open's source code is publicly available. [
 
 One may retrieve it by issuing the following command:
 
-$ git clone git://github.com/hagemt/flick.git
+$ git clone git://github.com/hagemt/Lights-Open.git
 
 [3]: https://www.github.com/hagemt/Lights-Open
