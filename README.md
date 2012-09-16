@@ -1,5 +1,5 @@
 Lights Open
-==============
+===========
 
 Lights Open simulates a game of Lights Out, a 1995 game by Tiger Toys. [1]
 
@@ -7,14 +7,18 @@ Players are able to toggle grid squares by left-clicking on the desired square.
 
 Right-clicking anywhere on the grid rolls back the last move.
 
-To run, simply compile all the source files, and invoke:
+To run, simply compile all the source files using `javac`, and invoke:
 
-$ java edu.rpi.proglang.hw1.LightsOpenFrame statefile1.los statefile2.los ...
+$ java edu.rpi.hagemt.proglang.hw1.LightsOpenFrame statefile1.los ...
+
+Several sample state files are included in the top level directory `./state`.
+
+Finding their solutions, if they exist, is left as an exercise for the reader.
 
 [1]: http://en.wikipedia.org/wiki/Lights_Out_%28game%29
 
 License
--------
+-----
 
 The "Modified BSD License," as defined by the Open Source Initiative, governs Lights Open's availability. [2]
 
@@ -25,7 +29,7 @@ Contributors to Lights Open may add their names (and email address) to the ./AUT
 [2]: http://www.opensource.org/licenses/bsd-license
 
 Source Code
-----
+-----
 
 In accordance with the above, Lights Open's source code is publicly available. [3]
 
