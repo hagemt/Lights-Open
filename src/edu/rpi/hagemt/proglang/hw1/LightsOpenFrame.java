@@ -17,7 +17,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -29,7 +28,7 @@ public class LightsOpenFrame extends javax.swing.JFrame
 	private Cell[][] grid;
   /* extra representation for record-keeping */
 	protected int toggleCount;
-	protected List<Dimension> moves;
+	protected LinkedList<Dimension> moves;
 
 	public LightsOpenFrame(ArrayList<boolean[]> state) {
     /* Find the thinest row of the given boardstate */
@@ -82,7 +81,7 @@ public class LightsOpenFrame extends javax.swing.JFrame
     try {
       Cell c = grid[x][y];
       setEnabled(c, !c.s);
-    } catch (IndexOutOfBoundsError) {
+    } catch (IndexOutOfBoundsException ioobe) {
       return false;
     }
     return true;
@@ -101,13 +100,14 @@ public class LightsOpenFrame extends javax.swing.JFrame
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+    Cell c;
 		switch (e.getButton()) {
 		case MouseEvent.BUTTON1:
-			Cell c = (Cell)(e.getComponent());
-      toggleNeightborhood(c.x, c.y);
-      /* Record the click for undo stack */
-			setTitle("Lights Open (t = " + ++toggleCount + ")");
+			c = (Cell)(e.getComponent());
+      toggleNeighborhood(c.x, c.y);
 			c.l.setText(Integer.toString(++c.z));
+			setTitle("Lights Open (t = " + ++toggleCount + ")");
+      /* Record the click for undo stack */
 			moves.push(new Dimension(c.x, c.y));
 			break;
 		case MouseEvent.BUTTON3:
@@ -117,7 +117,7 @@ public class LightsOpenFrame extends javax.swing.JFrame
       /* Trigger an undo */
 			mouseExited(e); // clear the colorings
 			Dimension d = moves.pop();
-			Cell c = grid[d.width][d.height];
+			c = grid[d.width][d.height];
       toggleNeighborhood(c.x, c.y);
 			c.l.setText(Integer.toString(--c.z));
 			setTitle("Lights Open (t = " + --toggleCount + ")");
@@ -202,7 +202,7 @@ public class LightsOpenFrame extends javax.swing.JFrame
 						reader.close();
 					}
           /* Instantiate a local copy of the state for the thread */
-					final ArrayList<boolean[]> final_state = (ArrayList<boolean[]>)(boardstate.clone());
+					final ArrayList<boolean[]> final_state = new ArrayList<boolean[]>(boardstate);
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
