@@ -2,33 +2,37 @@
  * LightsOpenFrame.java, part of Lights Open
  * Author: Tor E Hagemann <hagemt@rpi.edu>
  */
-package edu.rpi.proglang.hw1;
+package edu.rpi.hagemt.proglang.hw1;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
-public class LightsOpenFrame extends JFrame implements MouseListener, SwingConstants {
+public class LightsOpenFrame extends javax.swing.JFrame
+  implements MouseListener, LightsOpenConstants {
 	private static final long serialVersionUID = -8678965842858286808L;
 	private JPanel container;
 	private Cell[][] grid;
-	private int toggleCount;
-	private LinkedList<Dimension> moves;
+  /* extra representation for record-keeping */
+	protected int toggleCount;
+	protected List<Dimension> moves;
 
 	public LightsOpenFrame(ArrayList<boolean[]> state) {
+    /* Find the thinest row of the given boardstate */
 		int min_width = Integer.MAX_VALUE;
 		for (boolean[] b : state) {
 			if (b == null) {
@@ -38,22 +42,24 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			}
 		}
 		if (state.size() < 1 || min_width == 0) {
-			throw new IllegalArgumentException("Invalid state!");
+			throw new IllegalArgumentException("state cannot contain zero-length entries");
 		}
-		container = new JPanel(new GridLayout(state.size(), min_width, 5, 5));
-		grid = new Cell[state.size()][min_width];
 		moves = new LinkedList<Dimension>();
+    /* Initialize the frame's GUI components */
+		container = new JPanel(new GridLayout(state.size(), min_width, PADDING, PADDING));
+		grid = new Cell[state.size()][min_width];
 		for (int i = 0; i < state.size(); ++i) {
 			for (int j = 0; j < min_width; ++j) {
 				container.add(grid[i][j] = new Cell(i, j, state.get(i)[j]));
-				grid[i][j].setPreferredSize(new Dimension(192, 192));
+				grid[i][j].setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
 				grid[i][j].setBackground((grid[i][j].s) ? Color.WHITE : Color.BLACK);
 				grid[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 				grid[i][j].addMouseListener(this);
 			}
 		}
 		container.setBackground(Color.DARK_GRAY);
-		container.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		container.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+    /* Initialize properties of the frame */
 		getContentPane().add(container);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("Lights Open (t = " + (toggleCount = 0) + ")");
@@ -64,25 +70,42 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 		c.setBackground((c.s = state) ? Color.WHITE : Color.BLACK);
 	}
 
+  private void hovered(Cell c, Color bg) {
+    if (bg != null) {
+      c.setBackground(bg);
+    } else {
+      setEnabled(c, c.s);
+    }
+  }
+
+  public boolean toggle(int x, int y) {
+    try {
+      Cell c = grid[x][y];
+      setEnabled(c, !c.s);
+    } catch (IndexOutOfBoundsError) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean toggleNeighborhood(int x, int y) {
+      boolean success = toggle(x, y);
+      if (success) {
+  			success &= toggle(x - 1, y);
+	  		success &= toggle(x, y - 1);
+		  	success &= toggle(x + 1, y);
+			  success &= toggle(x, y + 1);
+      }
+      return success;
+  }
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		Cell c;
 		switch (e.getButton()) {
 		case MouseEvent.BUTTON1:
-			c = (Cell)(e.getComponent());
-			setEnabled(c, !c.s);
-			if (c.x > 0) {
-				setEnabled(grid[c.x - 1][c.y], !grid[c.x - 1][c.y].s);
-			}
-			if (c.y > 0) {
-				setEnabled(grid[c.x][c.y - 1], !grid[c.x][c.y - 1].s);
-			}
-			if (c.x + 1 < grid.length) {
-				setEnabled(grid[c.x + 1][c.y], !grid[c.x + 1][c.y].s);
-			}
-			if (c.y + 1 < grid[c.x].length) {
-				setEnabled(grid[c.x][c.y + 1], !grid[c.x][c.y + 1].s);
-			}
+			Cell c = (Cell)(e.getComponent());
+      toggleNeightborhood(c.x, c.y);
+      /* Record the click for undo stack */
 			setTitle("Lights Open (t = " + ++toggleCount + ")");
 			c.l.setText(Integer.toString(++c.z));
 			moves.push(new Dimension(c.x, c.y));
@@ -91,95 +114,94 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 			if (moves.isEmpty()) {
 				return;
 			}
-			mouseExited(e);
+      /* Trigger an undo */
+			mouseExited(e); // clear the colorings
 			Dimension d = moves.pop();
-			c = grid[d.width][d.height];
-			setEnabled(c, !c.s);
-			if (c.x > 0) {
-				setEnabled(grid[c.x - 1][c.y], !grid[c.x - 1][c.y].s);
-			}
-			if (c.y > 0) {
-				setEnabled(grid[c.x][c.y - 1], !grid[c.x][c.y - 1].s);
-			}
-			if (c.x + 1 < grid.length) {
-				setEnabled(grid[c.x + 1][c.y], !grid[c.x + 1][c.y].s);
-			}
-			if (c.y + 1 < grid[c.x].length) {
-				setEnabled(grid[c.x][c.y + 1], !grid[c.x][c.y + 1].s);
-			}
-			setTitle("Lights Open (t = " + --toggleCount + ")");
+			Cell c = grid[d.width][d.height];
+      toggleNeighborhood(c.x, c.y);
 			c.l.setText(Integer.toString(--c.z));
-			mouseEntered(e);
+			setTitle("Lights Open (t = " + --toggleCount + ")");
+			mouseEntered(e); // reset the colorings
 			break;
 		}
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		Cell c = (Cell)(e.getComponent());
-		c.setBackground(Color.RED);
+    Cell c = (Cell)(e.getComponent());
+    hovered(c, Color.RED);
 		if (c.x > 0) {
-			grid[c.x - 1][c.y].setBackground(Color.YELLOW);
+			hovered(grid[c.x - 1][c.y], Color.ORANGE);
 		}
 		if (c.y > 0) {
-			grid[c.x][c.y - 1].setBackground(Color.YELLOW);
+			hovered(grid[c.x][c.y - 1], Color.YELLOW);
 		}
 		if (c.x + 1 < grid.length) {
-			grid[c.x + 1][c.y].setBackground(Color.YELLOW);
+			hovered(grid[c.x + 1][c.y], Color.GREEN);
 		}
 		if (c.y + 1 < grid[c.x].length) {
-			grid[c.x][c.y + 1].setBackground(Color.YELLOW);
+			hovered(grid[c.x][c.y + 1], Color.BLUE);
 		}
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		Cell c = (Cell)(e.getComponent());
-		setEnabled(c, c.s);
+    Cell c = (Cell)(e.getComponent());
+    hovered(c, null);
 		if (c.x > 0) {
-			setEnabled(grid[c.x - 1][c.y], grid[c.x - 1][c.y].s);
+			hovered(grid[c.x - 1][c.y], null);
 		}
 		if (c.y > 0) {
-			setEnabled(grid[c.x][c.y - 1], grid[c.x][c.y - 1].s);
+			hovered(grid[c.x][c.y - 1], null);
 		}
 		if (c.x + 1 < grid.length) {
-			setEnabled(grid[c.x + 1][c.y], grid[c.x + 1][c.y].s);
+			hovered(grid[c.x + 1][c.y], null);
 		}
 		if (c.y + 1 < grid[c.x].length) {
-			setEnabled(grid[c.x][c.y + 1], grid[c.x][c.y + 1].s);
+			hovered(grid[c.x][c.y + 1], null);
 		}
 	}
 
 	@Override
-	public void mousePressed(MouseEvent e) { }
+	public void mousePressed(MouseEvent e) {
+    // TODO provide feedback?
+  }
 
 	@Override
-	public void mouseReleased(MouseEvent e) { }
+	public void mouseReleased(MouseEvent e) {
+    // TODO provide feedback?
+  }
 
 	public static void main(String... args) {
 		ArrayList<boolean[]> boardstate = new ArrayList<boolean[]>();
+    /* Treat all the arguments as paths to boardstate files */
 		for (String s : args) {
 			File f = new File(s);
 			if (f.canRead()) {
 				try {
+          /* This mess makes sure Java cleans up after itself */
 					BufferedReader reader = new BufferedReader(new FileReader(f));
 					try {
 						String line;
 						while ((line = reader.readLine()) != null) {
-							if (line.isEmpty() || line.startsWith("#")) {
+              /* Ignore empty lines and comments, disregarding whitespace*/
+              line = line.trim();
+							if (line.isEmpty() || line.startsWith(COMMENT_SEQUENCE)) {
 								continue;
 							}
+              /* Read a line from the file as boardstate */
 							boolean[] row = new boolean[line.length()];
 							for (int i = 0; i < line.length(); ++i) {
-								row[i] = (line.charAt(i) == 'W');
+								row[i] = (line.charAt(i) == ACTIVE_STATE);
 							}
 							boardstate.add(row);
 						}
 					} catch (IOException ioe) {
-						System.err.println("Cannot parse " + s + "!");
+						System.err.println("[ERROR] '" + s + "' (cannot parse file)");
 					} finally {
 						reader.close();
 					}
+          /* Instantiate a local copy of the state for the thread */
 					final ArrayList<boolean[]> final_state = (ArrayList<boolean[]>)(boardstate.clone());
 					javax.swing.SwingUtilities.invokeLater(new Runnable() {
 						@Override
@@ -188,8 +210,11 @@ public class LightsOpenFrame extends JFrame implements MouseListener, SwingConst
 						}
 					});
 				} catch (Exception e) {
+          /* Just dump all errors for now FIXME */
+          e.printStackTrace();
 					continue;
 				} finally {
+          /* Wipe the slate clean */
 					boardstate.clear();
 				}
 			}
