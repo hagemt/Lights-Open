@@ -7,9 +7,7 @@ Players are able to toggle grid squares by left-clicking on the desired square.
 
 Right-clicking anywhere on the grid rolls back the last move.
 
-To run, simply compile all the source files using `javac`, and invoke:
-
-$ java edu.rpi.hagemt.proglang.hw1.LightsOpenFrame statefile1.los ...
+To run, simply use `make` to build a `.jar` file and start playing.
 
 Several sample state files are included in the top level directory `./state`.
 
